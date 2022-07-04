@@ -1,5 +1,6 @@
 package com.codedifferently.tankofamerica.domain.user.controllers;
 
+import com.codedifferently.tankofamerica.domain.user.exceptions.UserNotFoundException;
 import com.codedifferently.tankofamerica.domain.user.models.User;
 import com.codedifferently.tankofamerica.domain.user.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,5 +31,11 @@ public class UserController {
     @ShellMethod(value = "Get All Users", key = "user get all")
     public String getAllUsers(){
         return userService.getAllUsers();
+    }
+
+    @ShellMethod(value = "Remove a user given an id: -U userId", key = "user delete")
+    public String removeUser(@ShellOption({"-U", "--userId"}) Long id) throws UserNotFoundException {
+        User user = userService.deleteUser(id);
+        return String.format("User %s was deleted.", user.toString());
     }
 }
