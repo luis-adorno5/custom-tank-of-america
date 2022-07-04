@@ -42,4 +42,12 @@ public class UserServiceImpl implements UserService {
         return optional.get();
     }
 
+    public User deleteUser(Long id) throws UserNotFoundException {
+        Optional<User> optional = userRepo.findById(id);
+        if(optional.isEmpty())
+            throw new UserNotFoundException(String.format("User with id {} not found", id));
+        userRepo.delete(optional.get());
+        return optional.get();
+    }
+
 }

@@ -7,4 +7,5 @@ public interface UserService {
     User create(User user);
     String getAllUsers();
     User getById(Long id) throws UserNotFoundException;
+    User deleteUser(Long id) throws UserNotFoundException;
 }
