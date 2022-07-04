@@ -14,5 +14,4 @@ public class TankOfAmericaApplication {
         SpringApplication.run(TankOfAmericaApplication.class, args);
     }
 
-
 }

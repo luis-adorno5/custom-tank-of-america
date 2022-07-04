@@ -5,8 +5,8 @@ spring:
     allow-circular-references: true
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/tank-of-america
+    url: jdbc:mysql://localhost:13306/tank-of-america
     username: root
-    password: tdd-cd
+    password: clean-code
   jpa:
       show-sql: false

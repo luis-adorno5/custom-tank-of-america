@@ -18,7 +18,7 @@ public class AccountController {
         this.accountService = accountService;
     }
 
-    @ShellMethod("Create new Account")
+    @ShellMethod(value = "Create new Account with args -U user id and -N The name of the account", key = "account new")
     public String createNewAccount (@ShellOption({"-U","--user"}) Long id,
                                      @ShellOption({"-N", "--name"}) String name){
         try {
@@ -30,12 +30,11 @@ public class AccountController {
         }
     }
 
-    @ShellMethod("Get User Accounts")
+    @ShellMethod(value = "Get specified user's accounts with -U user id", key = "account get")
     public String userAccounts(@ShellOption({"-U","--user"}) Long id){
 
         try{
-            String accounts = accountService.getAllFromUser(id);
-            return accounts;
+            return accountService.getAllFromUser(id);
         }catch (UserNotFoundException e){
             return "The User Id is invalid";
         }

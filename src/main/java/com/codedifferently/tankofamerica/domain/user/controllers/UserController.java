@@ -16,7 +16,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @ShellMethod("Create a new User")
+    @ShellMethod(value = "Create a new User: -F first name -L last name, -E email, -P password", key = "user new")
     public User createNewUser(@ShellOption({"-F", "--firstname"}) String firstName,
                               @ShellOption({"-L", "--lastname"})String lastName,
                               @ShellOption({"-E", "--email"})String email,
@@ -27,7 +27,7 @@ public class UserController {
 
     }
 
-    @ShellMethod("Get All Users")
+    @ShellMethod(value = "Get All Users", key = "user get all")
     public String getAllUsers(){
         return userService.getAllUsers();
     }
