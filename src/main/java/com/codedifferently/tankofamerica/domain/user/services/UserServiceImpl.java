@@ -42,6 +42,12 @@ public class UserServiceImpl implements UserService {
         return optional.get();
     }
 
+    @Override
+    public Boolean isEmailUnique(String email) {
+        Optional<User> optional = userRepo.findByEmail(email);
+        return optional.isEmpty();
+    }
+
     public User deleteUser(Long id) throws UserNotFoundException {
         Optional<User> optional = userRepo.findById(id);
         if(optional.isEmpty())

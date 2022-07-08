@@ -3,8 +3,8 @@ package com.codedifferently.tankofamerica.domain.account.controllers;
 import com.codedifferently.tankofamerica.domain.account.models.Account;
 import com.codedifferently.tankofamerica.domain.account.services.AccountService;
 import com.codedifferently.tankofamerica.domain.user.exceptions.UserNotFoundException;
-import com.codedifferently.tankofamerica.domain.user.models.User;
 import com.codedifferently.tankofamerica.domain.user.services.UserService;
+import com.codedifferently.tankofamerica.domain.utils.LoginHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.Availability;
 import org.springframework.shell.standard.ShellComponent;
@@ -15,23 +15,23 @@ import org.springframework.shell.standard.ShellOption;
 @ShellComponent
 public class AccountController {
 
-    private Boolean signedIn = false;
-    private User currentUser = null;
+    private LoginHelper loginHelper;
     private AccountService accountService;
     private UserService userService;
 
     @Autowired
-    public AccountController(AccountService accountService, UserService userService) {
+    public AccountController(AccountService accountService, UserService userService, LoginHelper userInfo) {
         this.accountService = accountService;
         this.userService = userService;
+        this.loginHelper = userInfo;
     }
 
     @ShellMethod(value = "Sign in to access account functionality provide -E email and -P password", key = "account login")
     public String signIn(@ShellOption({"-E", "--email"}) String username,
                        @ShellOption({"-P", "--password"}) String password){
         try{
-            currentUser = userService.getById(2L);
-            signedIn = true;
+            loginHelper.setCurrentUser(userService.getById(2L));
+            loginHelper.setSignedIn(true);
             return "Successfully logged in!";
         } catch (UserNotFoundException e) {
             return e.getMessage();
@@ -64,7 +64,7 @@ public class AccountController {
 
     public Availability isSignedIn()
     {
-        return signedIn ?
+        return loginHelper.getSignedIn() ?
                 Availability.available() : Availability.unavailable("Must be signed in first");
     }
 }

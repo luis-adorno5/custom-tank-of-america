@@ -3,6 +3,7 @@ package com.codedifferently.tankofamerica.domain.user.controllers;
 import com.codedifferently.tankofamerica.domain.user.exceptions.UserNotFoundException;
 import com.codedifferently.tankofamerica.domain.user.models.User;
 import com.codedifferently.tankofamerica.domain.user.services.UserService;
+import com.codedifferently.tankofamerica.domain.utils.LoginHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.Availability;
 import org.springframework.shell.standard.ShellComponent;
@@ -12,24 +13,28 @@ import org.springframework.shell.standard.ShellOption;
 
 @ShellComponent
 public class UserController {
-    private Boolean signedIn = false;
-    private User currentUser = null;
+    private LoginHelper loginHelper;
     private UserService userService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, LoginHelper userInfo) {
         this.userService = userService;
+        this.loginHelper = userInfo;
     }
 
-    @ShellMethod(value = "Create a new User: -F first name -L last name, -E email, -P password", key = "user new")
-    public User createNewUser(@ShellOption({"-F", "--firstname"}) String firstName,
+    @ShellMethod(value = "Create a new User: -F first name -L last name, -E email, -P password", key = "user signup")
+    public String signUp(@ShellOption({"-F", "--firstname"}) String firstName,
                               @ShellOption({"-L", "--lastname"})String lastName,
                               @ShellOption({"-E", "--email"})String email,
                               @ShellOption({"-P", "--password"})String password){
-        User user = new User(firstName,lastName,email,password);
-        user = userService.create(user);
-        return user;
-
+        if(userService.isEmailUnique(email)) {
+            User user = new User(firstName, lastName, email, password);
+            user = userService.create(user);
+            loginHelper.setCurrentUser(user);
+            loginHelper.setSignedIn(true);
+            return "You have successfully signed up";
+        }
+        return "The email you entered is already registered to a user!";
     }
 
     @ShellMethod(value = "Get All Users", key = "user get all")
@@ -44,6 +49,7 @@ public class UserController {
     }
 
     @ShellMethod(value = "Update a user's information.", key = "user update")
+    @ShellMethodAvailability("isSignedIn")
     public String updateUser(@ShellOption({"-U", "--userId"}) Long id,
                              @ShellOption({"-F", "--firstname"}) String firstName,
                              @ShellOption({"-L", "--lastname"}) String lastName,
@@ -68,7 +74,7 @@ public class UserController {
 
     public Availability isSignedIn()
     {
-        return signedIn ?
+        return loginHelper.getSignedIn() ?
                 Availability.available() : Availability.unavailable("Must be signed in first");
     }
 

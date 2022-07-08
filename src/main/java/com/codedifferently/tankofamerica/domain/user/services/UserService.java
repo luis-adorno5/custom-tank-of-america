@@ -7,6 +7,7 @@ public interface UserService {
     User create(User user);
     String getAllUsers();
     User getById(Long id) throws UserNotFoundException;
+    Boolean isEmailUnique(String email);
     User deleteUser(Long id) throws UserNotFoundException;
     User updateUser(User user) throws UserNotFoundException;
 }
