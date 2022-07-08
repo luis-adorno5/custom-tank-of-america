@@ -41,15 +41,12 @@ public class UserServiceImpTest {
 
     @Autowired
     private UserService userService;
-
     @MockBean
     private UserRepo userRepo;
 
     @Test
     public void getUserByIdTest01() throws UserNotFoundException {
         // Given
-        User mockUser = new User("Tariq", "Hook", "email@email", "pass");
-        mockUser.setId(1l);
         BDDMockito.doReturn(Optional.of(mockUser)).when(userRepo).findById(1l);
         User actualUser = userService.getById(1l);
         Assertions.assertEquals(mockUser, actualUser);
@@ -60,6 +57,21 @@ public class UserServiceImpTest {
         BDDMockito.doReturn(Optional.empty()).when(userRepo).findById(1l);
         Assertions.assertThrows(UserNotFoundException.class, ()->{
             userService.getById(1l);
+        });
+    }
+
+    @Test
+    public void getUserByEmailTest01() throws UserNotFoundException {
+        BDDMockito.doReturn(Optional.of(mockUser)).when(userRepo).findByEmail("fake@fakemail.com");
+        User actualUser = userService.getByEmail("fake@fakemail.com");
+        Assertions.assertEquals(mockUser, actualUser);
+    }
+
+    @Test
+    public void getUserByEmailTest02() {
+        BDDMockito.doReturn(Optional.empty()).when(userRepo).findByEmail("");
+        Assertions.assertThrows(UserNotFoundException.class, ()-> {
+            userService.getByEmail("");
         });
     }
 

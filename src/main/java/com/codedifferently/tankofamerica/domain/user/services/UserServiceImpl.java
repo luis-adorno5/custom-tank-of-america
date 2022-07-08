@@ -1,5 +1,6 @@
 package com.codedifferently.tankofamerica.domain.user.services;
 
+import com.codedifferently.tankofamerica.domain.user.exceptions.AccountCreationException;
 import com.codedifferently.tankofamerica.domain.user.exceptions.UserNotFoundException;
 import com.codedifferently.tankofamerica.domain.user.models.User;
 import com.codedifferently.tankofamerica.domain.user.repos.UserRepo;
@@ -21,8 +22,10 @@ public class UserServiceImpl implements UserService {
         this.userRepo = userRepo;
     }
 
-    public User create(User user){
-        return userRepo.save(user);
+    public User create(User user) throws AccountCreationException {
+        if(isEmailUnique(user.getEmail()))
+            userRepo.save(user);
+        throw new AccountCreationException();
     }
 
     public String getAllUsers(){
@@ -39,6 +42,13 @@ public class UserServiceImpl implements UserService {
         Optional<User> optional = userRepo.findById(id);
         if(optional.isEmpty())
             throw new UserNotFoundException(String.format("User with id {%s} not found", id));
+        return optional.get();
+    }
+
+    public User getByEmail(String email) throws UserNotFoundException{
+        Optional<User> optional = userRepo.findByEmail(email);
+        if(optional.isEmpty())
+            throw new UserNotFoundException(String.format("User with email {%s} not found", email));
         return optional.get();
     }
 

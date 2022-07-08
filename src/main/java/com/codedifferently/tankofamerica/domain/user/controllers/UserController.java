@@ -1,5 +1,6 @@
 package com.codedifferently.tankofamerica.domain.user.controllers;
 
+import com.codedifferently.tankofamerica.domain.user.exceptions.AccountCreationException;
 import com.codedifferently.tankofamerica.domain.user.exceptions.UserNotFoundException;
 import com.codedifferently.tankofamerica.domain.user.models.User;
 import com.codedifferently.tankofamerica.domain.user.services.UserService;
@@ -27,12 +28,16 @@ public class UserController {
                               @ShellOption({"-L", "--lastname"})String lastName,
                               @ShellOption({"-E", "--email"})String email,
                               @ShellOption({"-P", "--password"})String password){
-        if(userService.isEmailUnique(email)) {
-            User user = new User(firstName, lastName, email, password);
-            user = userService.create(user);
-            loginHelper.setCurrentUser(user);
-            loginHelper.setSignedIn(true);
-            return "You have successfully signed up";
+        try {
+            if (userService.isEmailUnique(email)) {
+                User user = new User(firstName, lastName, email, password);
+                user = userService.create(user);
+                loginHelper.setCurrentUser(user);
+                loginHelper.setSignedIn(true);
+                return "You have successfully signed up";
+            }
+        }catch (AccountCreationException e){
+            return e.getMessage();
         }
         return "The email you entered is already registered to a user!";
     }
