@@ -4,12 +4,16 @@ import com.codedifferently.tankofamerica.domain.user.exceptions.UserNotFoundExce
 import com.codedifferently.tankofamerica.domain.user.models.User;
 import com.codedifferently.tankofamerica.domain.user.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.shell.Availability;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
+import org.springframework.shell.standard.ShellMethodAvailability;
 import org.springframework.shell.standard.ShellOption;
 
 @ShellComponent
 public class UserController {
+    private Boolean signedIn = false;
+    private User currentUser = null;
     private UserService userService;
 
     @Autowired
@@ -38,4 +42,34 @@ public class UserController {
         User user = userService.deleteUser(id);
         return String.format("User %s was deleted.", user.toString());
     }
+
+    @ShellMethod(value = "Update a user's information.", key = "user update")
+    public String updateUser(@ShellOption({"-U", "--userId"}) Long id,
+                             @ShellOption({"-F", "--firstname"}) String firstName,
+                             @ShellOption({"-L", "--lastname"}) String lastName,
+                             @ShellOption({"-E", "--email"}) String email,
+                             @ShellOption({"-P", "--password"}) String password) throws UserNotFoundException {
+        if(firstName.length() == 0 || lastName.length() == 0 || email.length() == 0 || password.length() == 0)
+            return String.format("You did not provide changes to all of the fields.");
+        User user = setUserInfo(id, firstName, lastName, email, password);
+        userService.updateUser(user);
+        return String.format("Changed information of %s", user);
+    }
+
+    private User setUserInfo(Long id, String firstName, String lastName, String email, String password){
+        User user = new User();
+        user.setId(id);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setEmail(email);
+        user.setPassword(password);
+        return user;
+    }
+
+    public Availability isSignedIn()
+    {
+        return signedIn ?
+                Availability.available() : Availability.unavailable("Must be signed in first");
+    }
+
 }

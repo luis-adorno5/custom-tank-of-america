@@ -4,6 +4,7 @@ import com.codedifferently.tankofamerica.domain.user.exceptions.UserNotFoundExce
 import com.codedifferently.tankofamerica.domain.user.models.User;
 import com.codedifferently.tankofamerica.domain.user.repos.UserRepo;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
@@ -14,6 +15,7 @@ import org.springframework.shell.jline.InteractiveShellApplicationRunner;
 import org.springframework.shell.jline.ScriptShellApplicationRunner;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 @SpringBootTest(properties = {
@@ -23,6 +25,20 @@ import java.util.Optional;
 @ExtendWith(SpringExtension.class)
 public class UserServiceImpTest {
 
+    private User mockUser;
+    private User mockUser2;
+
+    private ArrayList<User> users;
+
+    @BeforeEach
+    void setUp() {
+        mockUser = new User("Tariq", "Hook", "email@email", "pass");
+        mockUser.setId(1l);
+        mockUser2 = new User("Hughie", "Campbell", "email@email", "pass");
+        mockUser2.setId(2l);
+        users = new ArrayList<>();
+    }
+
     @Autowired
     private UserService userService;
 
@@ -30,7 +46,7 @@ public class UserServiceImpTest {
     private UserRepo userRepo;
 
     @Test
-    public void getAllUsersTest01() throws UserNotFoundException {
+    public void getUserByIdTest01() throws UserNotFoundException {
         // Given
         User mockUser = new User("Tariq", "Hook", "email@email", "pass");
         mockUser.setId(1l);
@@ -40,11 +56,22 @@ public class UserServiceImpTest {
     }
 
     @Test
-    public void getAllUsersTest02(){
+    public void getUserByIdTest02(){
         BDDMockito.doReturn(Optional.empty()).when(userRepo).findById(1l);
         Assertions.assertThrows(UserNotFoundException.class, ()->{
             userService.getById(1l);
         });
+    }
+
+    @Test
+    public void getAllUsers01(){
+        users.add(mockUser);
+        users.add(mockUser2);
+        BDDMockito.doReturn(users).when(userRepo).findAll();
+        String expected = "1 Tariq Hook email@email pass\n" +
+                "2 Hughie Campbell email@email pass";
+        String actual = userService.getAllUsers();
+        Assertions.assertEquals(expected, actual);
     }
 
 }
