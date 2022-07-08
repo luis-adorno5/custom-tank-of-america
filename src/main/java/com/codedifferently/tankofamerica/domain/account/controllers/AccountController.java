@@ -26,18 +26,6 @@ public class AccountController {
         this.loginHelper = userInfo;
     }
 
-    @ShellMethod(value = "Sign in to access account functionality provide -E email and -P password", key = "account login")
-    public String signIn(@ShellOption({"-E", "--email"}) String username,
-                       @ShellOption({"-P", "--password"}) String password){
-        try{
-            loginHelper.setCurrentUser(userService.getById(2L));
-            loginHelper.setSignedIn(true);
-            return "Successfully logged in!";
-        } catch (UserNotFoundException e) {
-            return e.getMessage();
-        }
-    }
-
     @ShellMethod(value = "Create new Account with args -U user id and -N The name of the account", key = "account new")
     @ShellMethodAvailability("isSignedIn")
     public String createNewAccount (@ShellOption({"-U","--user"}) Long id,

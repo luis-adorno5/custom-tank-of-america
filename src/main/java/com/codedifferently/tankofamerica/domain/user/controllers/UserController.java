@@ -23,6 +23,28 @@ public class UserController {
         this.loginHelper = userInfo;
     }
 
+    @ShellMethod(value = "Sign in to access account functionality provide -E email and -P password", key = "user login")
+    public String signIn(@ShellOption({"-E", "--email"}) String email,
+                         @ShellOption({"-P", "--password"}) String password){
+        try {
+            User user = userService.getByEmail(email);
+            if (isPasswordValid(user, password)) {
+                loginHelper.setCurrentUser(user);
+                loginHelper.setSignedIn(true);
+                return "Successfully logged in.";
+            }
+            else{
+                return "User does not exist.";
+            }
+        } catch (UserNotFoundException e) {
+            return e.getMessage();
+        }
+    }
+
+    private Boolean isPasswordValid(User user, String password){
+        return user.getPassword().equals(password);
+    }
+
     @ShellMethod(value = "Create a new User: -F first name -L last name, -E email, -P password", key = "user signup")
     public String signUp(@ShellOption({"-F", "--firstname"}) String firstName,
                               @ShellOption({"-L", "--lastname"})String lastName,
