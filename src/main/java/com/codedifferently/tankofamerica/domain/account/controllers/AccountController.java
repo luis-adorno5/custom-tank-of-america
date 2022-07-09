@@ -39,11 +39,11 @@ public class AccountController {
         }
     }
 
-    @ShellMethod(value = "Get specified user's accounts with -U user id", key = "account get")
-    public String userAccounts(@ShellOption({"-U","--user"}) Long id){
+    @ShellMethod(value = "Get specified user's accounts with -U user id", key = "account get all")
+    public String userAccounts(){
 
         try{
-            return accountService.getAllFromUser(id);
+            return accountService.getAllFromUser(loginHelper.getCurrentUser().getId());
         }catch (UserNotFoundException e){
             return "The User Id is invalid";
         }

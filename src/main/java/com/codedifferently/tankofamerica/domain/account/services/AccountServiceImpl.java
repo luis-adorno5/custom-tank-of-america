@@ -46,6 +46,11 @@ public class AccountServiceImpl implements AccountService{
     }
 
     @Override
+    public Boolean isAccountNameUnique(String name) {
+        return accountRepo.existsByName(name);
+    }
+
+    @Override
     public Account update(Account account) {
         return null;
     }

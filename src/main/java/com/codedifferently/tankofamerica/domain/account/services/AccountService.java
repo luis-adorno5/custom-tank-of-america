@@ -7,6 +7,7 @@ public interface AccountService {
     Account create(Long userId, Account account) throws UserNotFoundException;
     String getById(String id);
     String getAllFromUser(Long userId) throws UserNotFoundException;
+    Boolean isAccountNameUnique(String name);
     Account update(Account account);
     Boolean delete(String id);
 }

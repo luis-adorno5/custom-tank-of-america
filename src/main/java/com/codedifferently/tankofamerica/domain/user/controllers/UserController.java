@@ -64,6 +64,15 @@ public class UserController {
         return "The email you entered is already registered to a user!";
     }
 
+    @ShellMethod(value = "Log off from account if signed in.", key = "user logoff")
+    public String logOff(){
+        if(loginHelper.getSignedIn()){
+            loginHelper.setSignedIn(false);
+            return "You have successfully logged off.";
+        }
+        return "You are currently not logged in!";
+    }
+
     @ShellMethod(value = "Get All Users", key = "user get all")
     public String getAllUsers(){
         return userService.getAllUsers();
