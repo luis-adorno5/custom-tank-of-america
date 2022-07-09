@@ -3,6 +3,7 @@ package com.codedifferently.tankofamerica.domain.user.services;
 import com.codedifferently.tankofamerica.domain.user.exceptions.AccountCreationException;
 import com.codedifferently.tankofamerica.domain.user.exceptions.UserNotFoundException;
 import com.codedifferently.tankofamerica.domain.user.models.User;
+import com.codedifferently.tankofamerica.domain.user.models.UserRoles;
 import com.codedifferently.tankofamerica.domain.user.repos.UserRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +24,10 @@ public class UserServiceImpl implements UserService {
     }
 
     public User create(User user) throws AccountCreationException {
-        if(isEmailUnique(user.getEmail()))
-            userRepo.save(user);
+        if(isEmailUnique(user.getEmail())) {
+            user.setRole(UserRoles.USER);
+            return userRepo.save(user);
+        }
         throw new AccountCreationException();
     }
 

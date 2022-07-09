@@ -3,6 +3,7 @@ package com.codedifferently.tankofamerica.domain.account.controllers;
 import com.codedifferently.tankofamerica.domain.account.models.Account;
 import com.codedifferently.tankofamerica.domain.account.services.AccountService;
 import com.codedifferently.tankofamerica.domain.user.exceptions.UserNotFoundException;
+import com.codedifferently.tankofamerica.domain.user.models.UserRoles;
 import com.codedifferently.tankofamerica.domain.user.services.UserService;
 import com.codedifferently.tankofamerica.domain.utils.LoginHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class AccountController {
         this.loginHelper = userInfo;
     }
 
-    @ShellMethod(value = "Create new Account with args -U user id and -N The name of the account", key = "account new")
+    @ShellMethod(value = "Create new Account with the argument -N The name of the account", key = "account new")
     @ShellMethodAvailability("isSignedIn")
     public String createNewAccount (@ShellOption({"-U","--user"}) Long id,
                                      @ShellOption({"-N", "--name"}) String name){
@@ -39,7 +40,8 @@ public class AccountController {
         }
     }
 
-    @ShellMethod(value = "Get specified user's accounts with -U user id", key = "account get all")
+    @ShellMethod(value = "Get specified user's accounts.", key = "account get all")
+    @ShellMethodAvailability("isSignedIn")
     public String userAccounts(){
 
         try{

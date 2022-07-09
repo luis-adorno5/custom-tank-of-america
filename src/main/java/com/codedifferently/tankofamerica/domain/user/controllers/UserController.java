@@ -3,6 +3,7 @@ package com.codedifferently.tankofamerica.domain.user.controllers;
 import com.codedifferently.tankofamerica.domain.user.exceptions.AccountCreationException;
 import com.codedifferently.tankofamerica.domain.user.exceptions.UserNotFoundException;
 import com.codedifferently.tankofamerica.domain.user.models.User;
+import com.codedifferently.tankofamerica.domain.user.models.UserRoles;
 import com.codedifferently.tankofamerica.domain.user.services.UserService;
 import com.codedifferently.tankofamerica.domain.utils.LoginHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,17 +69,20 @@ public class UserController {
     public String logOff(){
         if(loginHelper.getSignedIn()){
             loginHelper.setSignedIn(false);
+            loginHelper.setCurrentUser(null);
             return "You have successfully logged off.";
         }
         return "You are currently not logged in!";
     }
 
     @ShellMethod(value = "Get All Users", key = "user get all")
+    @ShellMethodAvailability("isSignedInAsAdmin")
     public String getAllUsers(){
         return userService.getAllUsers();
     }
 
     @ShellMethod(value = "Remove a user given an id: -U userId", key = "user delete")
+    @ShellMethodAvailability("isSignedInAsAdmin")
     public String removeUser(@ShellOption({"-U", "--userId"}) Long id) throws UserNotFoundException {
         User user = userService.deleteUser(id);
         return String.format("User %s was deleted.", user.toString());
@@ -112,6 +116,12 @@ public class UserController {
     {
         return loginHelper.getSignedIn() ?
                 Availability.available() : Availability.unavailable("Must be signed in first");
+    }
+
+    public Availability isSignedInAsAdmin()
+    {
+        return loginHelper.getSignedIn() && loginHelper.getCurrentUser().getRole().equals(UserRoles.ADMIN) ?
+                Availability.available() : Availability.unavailable("Must be signed in first and be an admin");
     }
 
 }
