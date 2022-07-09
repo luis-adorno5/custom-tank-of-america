@@ -1,5 +1,6 @@
 package com.codedifferently.tankofamerica.domain.account.controllers;
 
+import com.codedifferently.tankofamerica.domain.account.exceptions.AccountNotFoundException;
 import com.codedifferently.tankofamerica.domain.account.models.Account;
 import com.codedifferently.tankofamerica.domain.account.services.AccountService;
 import com.codedifferently.tankofamerica.domain.user.exceptions.UserNotFoundException;
@@ -29,11 +30,10 @@ public class AccountController {
 
     @ShellMethod(value = "Create new Account with the argument -N The name of the account", key = "account new")
     @ShellMethodAvailability("isSignedIn")
-    public String createNewAccount (@ShellOption({"-U","--user"}) Long id,
-                                     @ShellOption({"-N", "--name"}) String name){
+    public String createNewAccount (@ShellOption({"-N", "--name"}) String name){
         try {
             Account account = new Account(name);
-            account = accountService.create(id, account);
+            account = accountService.create(loginHelper.getCurrentUser().getId(), account);
             return account.toString();
         } catch (UserNotFoundException e) {
             return "The User Id is invalid";
@@ -50,6 +50,25 @@ public class AccountController {
             return "The User Id is invalid";
         }
 
+    }
+
+    @ShellMethod(value = "Deposit funds to specified account with arg -N name", key = "account deposit")
+    @ShellMethodAvailability("isSignedIn")
+    public String deposit(@ShellOption({"-N", "--name"}) String name,
+                          @ShellOption({"-A", "--amount"}) Double amount){
+        if(accountService.isAccountNameUnique(name, loginHelper.getCurrentUser())){
+            return "You do not have an account with the specified name!";
+        }
+        if(amount < 0)
+            return "Your deposit amount is invalid!";
+        try {
+            Account account = accountService.getByName(name, loginHelper.getCurrentUser());
+            Double newBalance = account.getBalance() + amount;
+            accountService.updateBalance(newBalance, account);
+            return String.format("Your new account balance is %.2f", newBalance);
+        }catch (AccountNotFoundException e){
+            return e.getMessage();
+        }
     }
 
     public Availability isSignedIn()

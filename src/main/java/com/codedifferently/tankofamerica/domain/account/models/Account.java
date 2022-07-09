@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -15,11 +16,11 @@ public class Account {
     @GenericGenerator(name= "uuid2", strategy = "uuid2")
     @Type(type="uuid-char")
     private UUID id;
-
     private String name;
-
+    private Double balance = 0.0;
     @ManyToOne()
     private User owner;
+    private Boolean frozen = false;
 
     public Account() {
     }
@@ -56,6 +57,35 @@ public class Account {
 
     public void setOwner(User owner) {
         this.owner = owner;
+    }
+
+    public Double getBalance() {
+        return balance;
+    }
+
+    public void setBalance(Double balance) {
+        this.balance = balance;
+    }
+
+    public Boolean getFrozen() {
+        return frozen;
+    }
+
+    public void setFrozen(Boolean frozen) {
+        this.frozen = frozen;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Account account = (Account) o;
+        return Objects.equals(id, account.id) && Objects.equals(name, account.name) && Objects.equals(balance, account.balance) && Objects.equals(owner, account.owner) && Objects.equals(frozen, account.frozen);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, balance, owner, frozen);
     }
 
     public String toString(){

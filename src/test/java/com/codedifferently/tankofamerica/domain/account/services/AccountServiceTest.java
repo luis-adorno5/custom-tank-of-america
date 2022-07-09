@@ -1,5 +1,6 @@
 package com.codedifferently.tankofamerica.domain.account.services;
 
+import com.codedifferently.tankofamerica.domain.account.exceptions.AccountNotFoundException;
 import com.codedifferently.tankofamerica.domain.account.models.Account;
 import com.codedifferently.tankofamerica.domain.account.repo.AccountRepo;
 import com.codedifferently.tankofamerica.domain.user.exceptions.UserNotFoundException;
@@ -70,6 +71,21 @@ public class AccountServiceTest {
         BDDMockito.doReturn(Optional.empty()).when(userRepo).findById(1L);
         Assertions.assertThrows(UserNotFoundException.class, () -> {
             accountService.getAllFromUser(1L);
+        });
+    }
+
+    @Test
+    public void getAccountByName01() throws AccountNotFoundException {
+        BDDMockito.doReturn(Optional.of(mockAccount)).when(accountRepo).findByName("Checkings");
+        Account actual = accountService.getByName("Checkings");
+        Assertions.assertEquals(mockAccount, actual);
+    }
+
+    @Test
+    public void getAccountByName02() {
+        BDDMockito.doReturn(Optional.empty()).when(accountRepo).findByName("Checkings");
+        Assertions.assertThrows(AccountNotFoundException.class, () -> {
+            accountService.getByName("Checkings");
         });
     }
 

@@ -1,5 +1,6 @@
 package com.codedifferently.tankofamerica.domain.account.services;
 
+import com.codedifferently.tankofamerica.domain.account.exceptions.AccountNotFoundException;
 import com.codedifferently.tankofamerica.domain.account.models.Account;
 import com.codedifferently.tankofamerica.domain.account.repo.AccountRepo;
 import com.codedifferently.tankofamerica.domain.user.exceptions.UserNotFoundException;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AccountServiceImpl implements AccountService{
@@ -35,6 +37,16 @@ public class AccountServiceImpl implements AccountService{
     }
 
     @Override
+    public Account getByName(String name, User owner) throws AccountNotFoundException{
+        List<Account> accounts = accountRepo.findByOwner(owner);
+        for(Account account : accounts){
+            if(account.getName().equals(name))
+                return account;
+        }
+        throw new AccountNotFoundException(String.format("You do not own an account with name %s", name));
+    }
+
+    @Override
     public String getAllFromUser(Long userId) throws UserNotFoundException {
         StringBuilder builder = new StringBuilder();
         User owner = userService.getById(userId);
@@ -46,8 +58,20 @@ public class AccountServiceImpl implements AccountService{
     }
 
     @Override
-    public Boolean isAccountNameUnique(String name) {
-        return accountRepo.existsByName(name);
+    public Boolean isAccountNameUnique(String name, User owner) {
+        List<Account> accounts = accountRepo.findByOwner(owner);
+        for(Account a : accounts){
+            if(a.getName().equals(name))
+                return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String updateBalance(Double balance, Account account) {
+        account.setBalance(balance);
+        accountRepo.save(account);
+        return "Successfully updated the accounts balance.";
     }
 
     @Override
