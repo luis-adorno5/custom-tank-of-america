@@ -32,9 +32,13 @@ public class AccountController {
     @ShellMethodAvailability("isSignedIn")
     public String createNewAccount (@ShellOption({"-N", "--name"}) String name){
         try {
-            Account account = new Account(name);
-            account = accountService.create(loginHelper.getCurrentUser().getId(), account);
-            return account.toString();
+            if(accountService.isAccountNameUnique(name, loginHelper.getCurrentUser())) {
+                Account account = new Account(name);
+                account = accountService.create(loginHelper.getCurrentUser().getId(), account);
+                return account.toString();
+            }else{
+                return "You already own an account with the given name.";
+            }
         } catch (UserNotFoundException e) {
             return "The User Id is invalid";
         }
