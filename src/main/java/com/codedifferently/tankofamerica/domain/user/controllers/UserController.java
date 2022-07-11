@@ -42,10 +42,6 @@ public class UserController {
         }
     }
 
-    private Boolean isPasswordValid(User user, String password){
-        return user.getPassword().equals(password);
-    }
-
     @ShellMethod(value = "Create a new User: -F first name -L last name, -E email, -P password", key = "user signup")
     public String signUp(@ShellOption({"-F", "--firstname"}) String firstName,
                               @ShellOption({"-L", "--lastname"})String lastName,
@@ -66,6 +62,7 @@ public class UserController {
     }
 
     @ShellMethod(value = "Log off from account if signed in.", key = "user logoff")
+    @ShellMethodAvailability("isSignedIn")
     public String logOff(){
         if(loginHelper.getSignedIn()){
             loginHelper.setSignedIn(false);
@@ -110,6 +107,10 @@ public class UserController {
         user.setEmail(email);
         user.setPassword(password);
         return user;
+    }
+
+    private Boolean isPasswordValid(User user, String password){
+        return user.getPassword().equals(password);
     }
 
     public Availability isSignedIn()
