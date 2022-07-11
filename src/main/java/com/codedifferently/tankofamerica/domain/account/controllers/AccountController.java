@@ -75,6 +75,27 @@ public class AccountController {
         }
     }
 
+    @ShellMethod(value = "Withdraw funds from a specified account with arg -N name", key = "account withdraw")
+    @ShellMethodAvailability("isSignedIn")
+    public String withdraw(@ShellOption({"-N", "--name"}) String name,
+                          @ShellOption({"-A", "--amount"}) Double amount){
+        if(accountService.isAccountNameUnique(name, loginHelper.getCurrentUser())){
+            return "You do not have an account with the specified name!";
+        }
+        if(amount < 0)
+            return "Your withdraw amount is invalid!";
+        try {
+            Account account = accountService.getByName(name, loginHelper.getCurrentUser());
+            Double newBalance = account.getBalance() - amount;
+            if(newBalance < 0)
+                return "You do not have enough funds to withdraw.";
+            accountService.updateBalance(newBalance, account);
+            return String.format("Your new account balance is %.2f", newBalance);
+        }catch (AccountNotFoundException e){
+            return e.getMessage();
+        }
+    }
+
     public Availability isSignedIn()
     {
         return loginHelper.getSignedIn() ?
