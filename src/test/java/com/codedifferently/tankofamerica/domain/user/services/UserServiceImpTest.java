@@ -2,6 +2,7 @@ package com.codedifferently.tankofamerica.domain.user.services;
 
 import com.codedifferently.tankofamerica.domain.user.exceptions.UserNotFoundException;
 import com.codedifferently.tankofamerica.domain.user.models.User;
+import com.codedifferently.tankofamerica.domain.user.models.UserRoles;
 import com.codedifferently.tankofamerica.domain.user.repos.UserRepo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,8 +35,10 @@ public class UserServiceImpTest {
     void setUp() {
         mockUser = new User("Tariq", "Hook", "email@email", "pass");
         mockUser.setId(1l);
+        mockUser.setRole(UserRoles.USER);
         mockUser2 = new User("Hughie", "Campbell", "email@email", "pass");
         mockUser2.setId(2l);
+        mockUser2.setRole(UserRoles.USER);
         users = new ArrayList<>();
     }
 
@@ -80,8 +83,8 @@ public class UserServiceImpTest {
         users.add(mockUser);
         users.add(mockUser2);
         BDDMockito.doReturn(users).when(userRepo).findAll();
-        String expected = "1 Tariq Hook email@email pass\n" +
-                "2 Hughie Campbell email@email pass";
+        String expected = "1 USER Tariq Hook email@email\n" +
+                "2 USER Hughie Campbell email@email";
         String actual = userService.getAllUsers();
         Assertions.assertEquals(expected, actual);
     }

@@ -20,6 +20,7 @@ import org.springframework.shell.jline.ScriptShellApplicationRunner;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -76,16 +77,18 @@ public class AccountServiceTest {
 
     @Test
     public void getAccountByName01() throws AccountNotFoundException {
-        BDDMockito.doReturn(Optional.of(mockAccount)).when(accountRepo).findByName("Checkings");
-        Account actual = accountService.getByName("Checkings");
+        List<Account> accountList = new ArrayList<>();
+        accountList.add(mockAccount);
+        BDDMockito.doReturn(accountList).when(accountRepo).findByOwner(mockUser);
+        Account actual = accountService.getByName("Checkings", mockUser);
         Assertions.assertEquals(mockAccount, actual);
     }
 
     @Test
     public void getAccountByName02() {
-        BDDMockito.doReturn(Optional.empty()).when(accountRepo).findByName("Checkings");
+        BDDMockito.doReturn(new ArrayList<>()).when(accountRepo).findByOwner(mockUser);
         Assertions.assertThrows(AccountNotFoundException.class, () -> {
-            accountService.getByName("Checkings");
+            accountService.getByName("Checkings", mockUser);
         });
     }
 
